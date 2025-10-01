@@ -6,10 +6,60 @@
     <meta name="description" content="IRPINSA: Tu aliado estratégico para pagos de energía eléctrica fáciles, rápidos y seguros. Gestiona tus facturas y asegura la continuidad de tu suministro.">
     <meta name="keywords" content="IRPINSA, pago de energía, factura eléctrica, soluciones energéticas, pago fácil, pago seguro, Nicaragua">
     <title>IRPINSA - Soluciones de Pago de Energía</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="style.css"> 
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos del botón responsive */
+        .menu-toggle {
+            display: none; /* Oculto por defecto en escritorio */
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            /* Asegura que el contenedor de navegación pueda ordenar los elementos */
+            .main-header nav {
+                display: flex;
+                align-items: center;
+                /* El botón de menú debe ir primero en el HTML, pero visualmente a la derecha en el header */
+                justify-content: flex-end; 
+            }
+            
+            /* Oculta el menú por defecto en móviles y lo posiciona fuera de pantalla */
+            .main-header nav ul {
+                display: none; /* Mejor usar display: none en lugar de right: -100% para evitar problemas de scroll horizontal */
+                flex-direction: column;
+                position: absolute;
+                top: 70px; /* Posiciona debajo del header (ajustar si la altura del header es diferente) */
+                right: 0; /* Lo alinea a la derecha */
+                background: #004d99;
+                width: 200px;
+                padding: 20px 0;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                z-index: 999;
+            }
+
+            /* Muestra el menú cuando tiene la clase 'show' */
+            .main-header nav ul.show {
+                display: flex; /* Muestra el menú cuando el botón es presionado */
+            }
+            
+            .main-header nav ul li {
+                margin: 10px 20px;
+                text-align: right;
+            }
+
+            /* Muestra el botón de menú */
+            .menu-toggle {
+                display: block;
+            }
+        }
+    </style>
 </head>
 <body>
     <header class="main-header">
@@ -18,6 +68,7 @@
             <h1>IRPINSA</h1>
         </div>
         <nav>
+            <span class="menu-toggle">☰</span>
             <ul>
                 <li><a href="#inicio">Inicio</a></li>
                 <li><a href="promociones.html">Promociones</a></li>
@@ -27,7 +78,6 @@
                 <li><a href="#formulario">Formulario</a></li>
                 <li><a href="centros.html">Puntos de pagos autorizados </a></li>
                 <li><a href="#contacto">Contacto</a></li>
-                
             </ul>
         </nav>
     </header>
@@ -155,5 +205,48 @@
     </footer>
     
     <script src="script.js"></script>
+
+    <script>
+        // --- Lógica del Menú Responsive ---
+        const toggle = document.querySelector(".menu-toggle");
+        const menu = document.querySelector(".main-header nav ul");
+
+        // Al hacer clic en el ícono, se agrega o quita la clase 'show'
+        toggle.addEventListener("click", () => {
+            menu.classList.toggle("show");
+        });
+        
+        // Cierra el menú si se hace clic en un enlace (Mejora la navegación en móviles)
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+        
+        // --- Lógica del Control de Audio (anterior) ---
+        const miVideo = document.getElementById('miVideo');
+        const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+        const audioIconOn = document.querySelector('.audio-icon.on');
+        const audioIconOff = document.querySelector('.audio-icon.off');
+
+        if (miVideo && toggleAudioBtn) {
+            toggleAudioBtn.addEventListener('click', () => {
+                if (miVideo.muted) {
+                    miVideo.muted = false;
+                    audioIconOn.style.display = 'inline';
+                    audioIconOff.style.display = 'none';
+                    toggleAudioBtn.setAttribute('aria-label', 'Desactivar Sonido');
+                } else {
+                    miVideo.muted = true;
+                    audioIconOn.style.display = 'none';
+                    audioIconOff.style.display = 'inline';
+                    toggleAudioBtn.setAttribute('aria-label', 'Activar Sonido');
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>
