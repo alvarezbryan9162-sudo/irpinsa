@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRPINSA - Puntos de Pago Autorizados</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+
+    <style>
+        :root {
+            --primary-color: #004d99; /* Azul IRPINSA */
+            --secondary-color: #f1c40f; /* Amarillo */
+            --light-bg: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .page-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .page-header a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 20px;
+        }
+        
+        /* Buscador / Search Bar */
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        #searchBtn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color var(--transition-speed);
+        }
+
+        #searchBtn:hover {
+            background-color: #003366; 
+        }
+
+        /* Mapa */
+        #map {
+            height: 400px; 
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 20px;
+        }
+
+        /* Lista de centros (Grid) */
+        h2 {
+            color: var(--primary-color);
+        }
+        
+        .centros-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo para el encabezado de la zona */
+        .zona-heading {
+            grid-column: 1 / -1; /* Ocupa todo el ancho en el grid */
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .center-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-left: 5px solid var(--secondary-color); 
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        .center-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .center-item b {
+            color: var(--primary-color);
+        }
+        /* Nuevo estilo para los números de teléfono */
+        .phone-number {
+            display: block;
+            margin-top: 5px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-header">
+        <a href="index.html">← Volver a Inicio</a>
+        <h1>Puntos de Pago Autorizados IRPINSA</h1>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por zona, nombre, gestor o teléfono...">
+        <button id="searchBtn">Buscar</button>
+    </div>
+
+    <div id="map"></div>
+
+    <h2>Centros de Pago Disponibles</h2>
+    <div id="centrosList" class="centros-list"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Estructura de datos segmentada por zonas geográficas (AQUÍ DEBES AGREGAR TUS 20 CENTROS POR ZONA)
+            const centrosPorZona = {
+                "Ciudad Sandino": [
+                    // AÑADIDO: campo 'telefono'
+                    { id: 1, nombre: "Del Gallo Mas Gallo una cuadra al lago", gestor: "Fátima G.", telefono: "88001100", coords: [12.1450, -86.2700] },
+                    { id: 2, nombre: "Oro Verde - 2DA. ENTRADA TIP", gestor: "Marlene R.", telefono: "88002200", coords: [12.1600, -86.3100] },
+                    { id: 1, nombre: "Del Gallo Mas Gallo una cuadra al lago", gestor: "Fátima G.", telefono: "88001100", coords: [12.1450, -86.2700] },
+                    { id: 2, nombre: "Oro Verde - 2DA. ENTRADA TIP", gestor: "Marlene R.", telefono: "88002200", coords: [12.1600, -86.3100] },
+                    { id: 1, nombre: "Del Gallo Mas Gallo una cuadra al lago", gestor: "Fátima G.", telefono: "88001100", coords: [12.1450, -86.2700] },
+                    { id: 2, nombre: "Oro Verde - 2DA. ENTRADA TIP", gestor: "Marlene R.", telefono: "88002200", coords: [12.1600, -86.3100] },
+                    { id: 1, nombre: "Del Gallo Mas Gallo una cuadra al lago", gestor: "Fátima G.", telefono: "88001100", coords: [12.1450, -86.2700] },
+                    { id: 2, nombre: "Oro Verde - 2DA. ENTRADA TIP", gestor: "Marlene R.", telefono: "88002200", coords: [12.1600, -86.3100] },
+                    { id: 1, nombre: "Del Gallo Mas Gallo una cuadra al lago", gestor: "Fátima G.", telefono: "88001100", coords: [12.1450, -86.2700] },
+                    { id: 2, nombre: "Oro Verde - 2DA. ENTRADA TIP", gestor: "Marlene R.", telefono: "88002200", coords: [12.1600, -86.3100] },
+                    { id: 1, nombre: "Del Gallo Mas Gallo una cuadra al lago", gestor: "Fátima G.", telefono: "88001100", coords: [12.1450, -86.2700] },
+                    { id: 2, nombre: "Oro Verde - 2DA. ENTRADA TIP", gestor: "Marlene R.", telefono: "88002200", coords: [12.1600, -86.3100] },
+                    // ... AGREGAR MÁS CENTROS AQUÍ (hasta 20)
+                ],
+                "Managua Centro Norte": [
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    { id: 3, nombre: "ZONA 8 PLAZA CALI 2 CUADRAS AL LAGO 3C. ARRIBA", gestor: "María P.", telefono: "88003300", coords: [12.1633, -86.3444] },
+                    { id: 4, nombre: "Rotadora", gestor: "Lesbia C.", telefono: "88004400", coords: [12.1670, -86.3380] },
+                    // ... AGREGAR MÁS CENTROS AQUÍ (hasta 20)
+                ],
+                "Managua Centro Sur": [
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    { id: 5, nombre: "Carolina Calero - PULP. ROMERO 4C. NORTE", gestor: "Adela A.", telefono: "88005500", coords: [12.1670, -86.3380] },
+                    { id: 6, nombre: "El Recreo - CASA AZUL", gestor: "Daysi O.", telefono: "88006600", coords: [12.1250, -86.2750] },
+                    // ... AGREGAR MÁS CENTROS AQUÍ (hasta 20)
+                ],
+                "Managua Sur Centro": [
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    { id: 7, nombre: "Ejemplo MN Centro 1", gestor: "Carlos M.", telefono: "88007700", coords: [12.1550, -86.2850] },
+                    // ... AGREGAR MÁS CENTROS AQUÍ (hasta 20)
+                ],
+                "Managua Sur Sur": [
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    { id: 8, nombre: "Ejemplo MSur 1", gestor: "Sofía T.", telefono: "88008800", coords: [12.1000, -86.2500] },
+                    // ... AGREGAR MÁS CENTROS AQUÍ (hasta 20)
+                ],
+                "Tipita": [
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },
+                    { id: 9, nombre: "Ejemplo MCSur 1", gestor: "Javier V.", telefono: "88009900", coords: [12.1200, -86.2600] },   
+                    // ... AGREGAR MÁS CENTROS AQUÍ (hasta 20)
+                ],
+                
+            };
+
+            // Inicializar mapa (Centrado en Managua)
+            const map = L.map('map').setView([12.1364, -86.2514], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const centrosListDiv = document.getElementById("centrosList");
+            const searchInput = document.getElementById("searchInput");
+            let markers = {};
+
+            // --- Funciones de Renderización y Filtrado ---
+
+            function renderCentro(c, zonaNombre) {
+                // Marcador en el mapa
+                // CONTENIDO DEL POPUP ACTUALIZADO
+                let popupContent = `
+                    <b>Zona: ${zonaNombre}</b><br>
+                    ${c.nombre}<br>
+                    *Gestor(a): ${c.gestor}*<br>
+                    <a href="tel:${c.telefono}" target="_blank">📞 Tel: ${c.telefono}</a>
+                `;
+                let marker = L.marker(c.coords).addTo(map).bindPopup(popupContent);
+                markers[`${zonaNombre}-${c.id}`] = marker; 
+
+                // Card de lista
+                // CONTENIDO DE LA TARJETA ACTUALIZADO
+                let card = document.createElement("div");
+                card.classList.add("center-item");
+                card.setAttribute('data-id', `${zonaNombre}-${c.id}`);
+                card.innerHTML = `
+                    <b>${zonaNombre}</b>
+                    <p>${c.nombre}</p>
+                    <small>Gestor(a): ${c.gestor}</small>
+                    <a href="tel:${c.telefono}" class="phone-number">📞 ${c.telefono}</a>
+                `;
+                card.addEventListener("click", () => {
+                    map.setView(marker.getLatLng(), 15);
+                    marker.openPopup();
+                });
+                centrosListDiv.appendChild(card);
+            }
+
+            // Función principal de búsqueda/filtrado que maneja la segmentación
+            function filterCentros() {
+                const filter = searchInput.value.toLowerCase();
+                let allMarkers = [];
+
+                // 1. Limpiar lista y mapa
+                centrosListDiv.innerHTML = '';
+                Object.values(markers).forEach(m => map.removeLayer(m));
+                markers = {};
+
+                // 2. Iterar sobre las zonas y sus centros
+                for (const zonaNombre in centrosPorZona) {
+                    const zonaLower = zonaNombre.toLowerCase();
+                    const centrosEnZona = centrosPorZona[zonaNombre];
+                    let zonaHasMatches = false;
+
+                    // Si la búsqueda coincide con el nombre de la zona, mostramos toda la zona
+                    if (zonaLower.includes(filter)) {
+                        zonaHasMatches = true;
+                    }
+
+                    const centrosFiltrados = centrosEnZona.filter(c => 
+                        zonaHasMatches || // Si la zona coincide, mostramos todo
+                        c.nombre.toLowerCase().includes(filter) ||
+                        c.gestor.toLowerCase().includes(filter) ||
+                        c.telefono.includes(filter) // NUEVO: Búsqueda por número de teléfono
+                    );
+
+                    // Si encontramos centros, agregamos el encabezado de la zona y los centros
+                    if (centrosFiltrados.length > 0) {
+                        let heading = document.createElement("div");
+                        heading.classList.add("zona-heading");
+                        heading.innerText = `Zona: ${zonaNombre} (${centrosFiltrados.length} centros)`;
+                        centrosListDiv.appendChild(heading);
+
+                        centrosFiltrados.forEach(c => {
+                            renderCentro(c, zonaNombre);
+                            allMarkers.push(markers[`${zonaNombre}-${c.id}`]);
+                        });
+                    }
+                }
+
+                // 3. Ajustar el mapa al grupo de marcadores filtrados
+                if (allMarkers.length > 0) {
+                    const group = new L.featureGroup(allMarkers);
+                    map.fitBounds(group.getBounds(), { padding: [20, 20] });
+                } else {
+                    // Si no hay resultados, restablece la vista central
+                    map.setView([12.1364, -86.2514], 11);
+                }
+            }
+
+            // Eventos de búsqueda: Inicia el filtrado al cargar la página (muestra todo)
+            filterCentros(); 
+            searchInput.addEventListener("keyup", filterCentros);
+            document.getElementById("searchBtn").addEventListener("click", filterCentros);
+        });
+    </script>
+</body>
+</html>

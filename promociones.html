@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IRPINSA - Promociones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- RESET ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    /* ---------- HEADER ---------- */
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #004d99;
+      padding: 15px 30px;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .main-header .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .main-header .logo img {
+      width: 50px;
+      margin-right: 10px;
+      border-radius: 8px;
+    }
+
+    .main-header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .main-header nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .main-header nav a:hover {
+      color: #ffcc00;
+    }
+
+    /* ---------- BOTÓN MENÚ RESPONSIVE ---------- */
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .main-header nav ul {
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        right: -100%;
+        background: #004d99;
+        width: 200px;
+        padding: 20px;
+        transition: right 0.3s ease-in-out;
+      }
+
+      .main-header nav ul.show {
+        right: 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+    }
+
+    /* ---------- PROMOCIONES ---------- */
+    .promotions-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .promotions-container h2 {
+      font-size: 2.5em;
+      color: #004d99;
+      margin-bottom: 20px;
+    }
+
+    .promo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    .promo-item {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .promo-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .promo-item img, .promo-item video {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .promo-item h3 {
+      font-size: 1.6em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .promo-item p {
+      font-size: 1em;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      background: #004d99;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+
+    footer .social-links {
+      margin-bottom: 10px;
+    }
+
+    footer .social-links a img {
+      width: 30px;
+      margin: 0 10px;
+      filter: brightness(0) invert(1);
+      transition: transform 0.3s;
+    }
+
+    footer .social-links a img:hover {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <img src="irpinsa-logo.jpg" alt="Logo de IRPINSA">
+      <h1>IRPINSA</h1>
+    </div>
+    <nav>
+      <span class="menu-toggle">☰</span>
+      <ul>
+        <li><a href="index.html#inicio">Inicio</a></li>
+        <li><a href="promociones.html">Promociones</a></li>
+        <li><a href="index.html#nosotros">Nosotros</a></li>
+        <li><a href="index.html#servicios">Servicios</a></li>
+        <li><a href="index.html#beneficios">Beneficios</a></li>
+        <li><a href="index.html#contacto">Contacto</a></li>
+        <li><a href="index.html#formulario">Formulario</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="promotions-container">
+      <h2>Nuestras Promociones</h2>
+      <div class="promo-grid">
+        <div class="promo-item">
+          <img src="j20.jpeg" alt="Promoción de una motocicleta">
+          <h3>¡Gana una Moto!</h3>
+          <p>Participa en nuestros sorteos al pagar tus facturas en cualquiera de nuestras sucursales. ¡Tu próximo pago podría convertirte en el feliz dueño de una motocicleta nueva!</p>
+        </div>
+        
+        <div class="promo-item">
+          <img src="j50.jpeg" alt="Promoción de 6 meses de energía gratis">
+          <h3>6 Meses de Energía Gratis</h3>
+          <p>Paga a tiempo y gana. Cada vez que pagas tu factura de energía con IRPINSA, tienes la oportunidad de ser uno de los ganadores de 6 meses de energía gratis. ¡No te quedes sin participar!</p>
+        </div>
+
+        <div class="promo-item">
+          <video controls autoplay muted loop>
+            <source src="WhatsApp Video 2025-08-28 at 12.28.16 PM.mp4" type="video/mp4">
+            Tu navegador no soporta el video.
+          </video>
+          <h3>Testimonios de Ganadores</h3>
+          <p>Escucha de primera mano las historias de nuestros afortunados ganadores. Ellos ya están disfrutando de sus premios gracias a su confianza en IRPINSA.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="social-links">
+      <a href="https://www.facebook.com/irpinsa?locale=es_LA" target="_blank" aria-label="Facebook">
+        <img src="facebook-icon.png" alt="Facebook">
+      </a>
+      <a href="https://www.tiktok.com/@irpinsa1" target="_blank" aria-label="TikTok">
+        <img src="tiktok-icon.png" alt="TikTok">
+      </a>
+    </div>
+    <p>&copy; 2025 IRPINSA. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // Menú responsive
+    const toggle = document.querySelector(".menu-toggle");
+    const menu = document.querySelector("nav ul");
+
+    toggle.addEventListener("click", () => {
+      menu.classList.toggle("show");
+    });
+  </script>
+</body>
+</html>
