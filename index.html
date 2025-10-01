@@ -14,29 +14,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Estilos del botón responsive */
+        /* Estilos del botón responsive (ÍCONO) */
         .menu-toggle {
             display: none; /* Oculto por defecto en escritorio */
             font-size: 1.8rem;
             cursor: pointer;
+            line-height: 1; /* Asegura que el ícono no añada altura extra */
         }
 
-        @media (max-width: 768px) {
-            /* Asegura que el contenedor de navegación pueda ordenar los elementos */
-            .main-header nav {
-                display: flex;
-                align-items: center;
-                /* El botón de menú debe ir primero en el HTML, pero visualmente a la derecha en el header */
-                justify-content: flex-end; 
-            }
+        /* Aplica los estilos cuando la pantalla es de 992px o menos (tu breakpoint) */
+        @media (max-width: 992px) {
             
-            /* Oculta el menú por defecto en móviles y lo posiciona fuera de pantalla */
+            /* 1. SOBREESCRIBE la regla 'flex-direction: column' de style.css y define el comportamiento móvil del header */
+            .main-header {
+                flex-direction: row !important; /* El logo y la nav en fila */
+                justify-content: space-between !important; /* Separados a los extremos */
+                padding-right: 5% !important; /* Asegura el espacio del borde */
+                padding-left: 5% !important;
+                gap: 0 !important;
+            }
+
+            /* 2. Estilo de la navegación: Necesita ser un contenedor para el toggle y el menú */
+            .main-header nav {
+                display: flex; /* Convierte NAV en un contenedor flexible */
+                justify-content: flex-end; /* Asegura que sus contenidos se peguen a la derecha */
+                align-items: center;
+            }
+
+            /* 3. Estilo de la lista de enlaces */
             .main-header nav ul {
-                display: none; /* Mejor usar display: none en lugar de right: -100% para evitar problemas de scroll horizontal */
+                display: none; /* Oculta el menú por defecto */
                 flex-direction: column;
                 position: absolute;
-                top: 70px; /* Posiciona debajo del header (ajustar si la altura del header es diferente) */
-                right: 0; /* Lo alinea a la derecha */
+                top: 70px; /* Ajusta si la altura de tu header cambia */
+                right: 0; 
                 background: #004d99;
                 width: 200px;
                 padding: 20px 0;
@@ -46,21 +57,25 @@
 
             /* Muestra el menú cuando tiene la clase 'show' */
             .main-header nav ul.show {
-                display: flex; /* Muestra el menú cuando el botón es presionado */
+                display: flex; 
             }
             
             .main-header nav ul li {
                 margin: 10px 20px;
-                text-align: right;
+                text-align: right; 
             }
 
             /* Muestra el botón de menú */
             .menu-toggle {
-                display: block;
+                display: block !important;
+                /* Asegura que el toggle esté siempre visible y no esté afectado por nav ul */
+                z-index: 1001; 
             }
         }
     </style>
 </head>
+</head>
+
 <body>
     <header class="main-header">
         <div class="logo">
@@ -216,7 +231,7 @@
             menu.classList.toggle("show");
         });
         
-        // Cierra el menú si se hace clic en un enlace (Mejora la navegación en móviles)
+        // Cierra el menú si se hace clic en un enlace
         menu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 if (menu.classList.contains('show')) {
@@ -225,7 +240,7 @@
             });
         });
         
-        // --- Lógica del Control de Audio (anterior) ---
+        // --- Lógica del Control de Audio ---
         const miVideo = document.getElementById('miVideo');
         const toggleAudioBtn = document.getElementById('toggleAudioBtn');
         const audioIconOn = document.querySelector('.audio-icon.on');
